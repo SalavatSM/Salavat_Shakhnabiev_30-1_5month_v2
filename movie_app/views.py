@@ -2,7 +2,8 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
 
-from .serializers import DirectorSerializer, MovieSerializer, ReviewSerializer
+from .serializers import (DirectorSerializer, MovieSerializer, ReviewSerializer, DirectorValidateSerializer,
+                          MovieValidateSerializer, ReviewValidateSerializer)
 from .models import Director, Movie, Review
 
 
@@ -13,8 +14,13 @@ def director_list_api_view(request):
         data = DirectorSerializer(instance=directors, many=True).data
         return Response(data=data)
     elif request.method == 'POST':
-        # 1. Get data from body
-        name = request.data.get('name')
+        # 0. Validation
+        serializer = DirectorValidateSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(status=status.HTTP_400_BAD_REQUEST,
+                            data={'errors': serializer.errors})
+        # 1. Get data from validated data
+        name = serializer.validated_data.get('name')
 
         # 2. Create object
         director = Director.objects.create(name=name)
@@ -49,12 +55,16 @@ def movie_list_api_view(request):
         data = MovieSerializer(instance=movies, many=True).data
         return Response(data=data)
     elif request.method == 'POST':
-        print(request.data)
-        # 1. Get data from body
-        title = request.data.get('title')
-        description = request.data.get('description')
-        duration = request.data.get('duration')
-        director_id = request.data.get('director_id')
+        # 0. Validation
+        serializer = MovieValidateSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(status=status.HTTP_400_BAD_REQUEST,
+                            data={'errors': serializer.errors})
+        # 1. Get data from validated data
+        title = serializer.validated_data.get('title')
+        description = serializer.validated_data.get('description')
+        duration = serializer.validated_data.get('duration')
+        director_id = serializer.validated_data.get('director_id')
         # rating = request.data.get('rating')
 
         # 2. Create object
@@ -96,11 +106,15 @@ def review_list_api_view(request):
         data = ReviewSerializer(instance=reviews, many=True).data
         return Response(data=data)
     elif request.method == 'POST':
-        print(request.data)
-        # 1. Get data from body
-        movie_id = request.data.get('movie_id')
-        text = request.data.get('text')
-        stars = request.data.get('stars')
+        # 0. Validation
+        serializer = ReviewValidateSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(status=status.HTTP_400_BAD_REQUEST,
+                            data={'errors': serializer.errors})
+        # 1. Get data from validated data
+        movie_id = serializer.validated_data.get('movie_id')
+        text = serializer.validated_data.get('text')
+        stars = serializer.validated_data.get('stars')
 
         # 2. Create object
         review = Review.objects.create(movie_id=movie_id, text=text)
