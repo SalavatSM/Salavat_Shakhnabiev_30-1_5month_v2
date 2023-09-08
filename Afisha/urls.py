@@ -1,6 +1,8 @@
 from django.contrib import admin
 from django.urls import path, include
 
+from Afisha import swagger
+
 from movie_app import views
 
 urlpatterns = [
@@ -15,5 +17,8 @@ urlpatterns = [
     path('api/v1/', include('movie_app.urls')),
     # path('api/v1/reviews/<int:review_id>/', views.review_detail_api_view),
 
-    path('api/v1/users/', include('users.urls'))
+    path('api/v1/users/', include('users.urls')),
+
 ]
+
+urlpatterns += swagger.urlpatterns
