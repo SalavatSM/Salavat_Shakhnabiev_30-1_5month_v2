@@ -101,6 +101,7 @@ def movie_detail_api_view(request, movie_id):
 
 @api_view(['GET', 'POST'])
 def review_list_api_view(request):
+    print(request.user)
     if request.method == 'GET':
         reviews = Review.objects.all()
         data = ReviewSerializer(instance=reviews, many=True).data
